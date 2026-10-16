@@ -5,7 +5,7 @@ Tiempo estimado: 30–60 minutos la primera vez. Hazlo en orden.
 ## 1. Descargar el kit
 
 ```bash
-git clone https://github.com/alpha34lm/reels-con-ia-kit.git
+git clone https://github.com/cristianrodas-dev/reels-con-ia-kit.git
 cd reels-con-ia-kit
 npm install
 cd video && npm install && cd ..
