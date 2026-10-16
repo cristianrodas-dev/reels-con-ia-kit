@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="400" viewBox="0 0 1280 400">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#13224A"/>
+      <stop offset="1" stop-color="#060C1E"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.78" cy="0.15" r="0.6">
+      <stop offset="0" stop-color="#1E3A8A" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#1E3A8A" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1280" height="400" fill="url(#bg)"/>
+  <rect width="1280" height="400" fill="url(#glow)"/>
+  <!-- rayo -->
+  <path d="M1105 30 L1075 140 L1110 140 L1060 260 L1092 260 L1030 380" fill="none" stroke="#F06A3C" stroke-width="7" stroke-linejoin="round" opacity="0.9"/>
+  <path d="M1105 30 L1075 140 L1110 140 L1060 260 L1092 260 L1030 380" fill="none" stroke="#FFD2BF" stroke-width="2" stroke-linejoin="round"/>
+  <!-- escudo -->
+  <g transform="translate(80 92)">
+    <path d="M27 3 L50 11 V29 C50 44 40 54 27 59 C14 54 4 44 4 29 V11 Z" fill="none" stroke="#F06A3C" stroke-width="4"/>
+    <rect x="17" y="28" width="20" height="16" rx="3" fill="#F06A3C"/>
+    <path d="M21 28 V23 a6 6 0 0 1 12 0 V28" fill="none" stroke="#F06A3C" stroke-width="3.5"/>
+  </g>
+  <text x="150" y="132" font-family="Montserrat, 'Segoe UI', Arial, sans-serif" font-weight="800" font-size="22" letter-spacing="7" fill="#B9C3DB">KIT ABIERTO · MIT</text>
+  <text x="78" y="232" font-family="Montserrat, 'Segoe UI', Arial, sans-serif" font-weight="900" font-size="92" fill="#FFFFFF">REELS CON <tspan fill="#F06A3C">IA</tspan></text>
+  <text x="80" y="292" font-family="Montserrat, 'Segoe UI', Arial, sans-serif" font-weight="600" font-size="28" fill="#D6DDEE">Guion · voz · video · publicación · métricas</text>
+  <text x="80" y="340" font-family="Montserrat, 'Segoe UI', Arial, sans-serif" font-weight="600" font-size="22" fill="#8C98B8">Hecho y usado a diario en @protocolosos.guia</text>
+</svg>

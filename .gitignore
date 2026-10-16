@@ -1,0 +1,26 @@
+# ── Secretos: NUNCA se suben ──
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ── Dependencias y builds ──
+node_modules/
+dist/
+__pycache__/
+*.pyc
+
+# ── Contenido generado (voces, renders, entregables propios) ──
+video/out/
+video/public/voz/
+video/public/brand/
+guion/reels/
+entregables/
+*.mp4
+*.mp3
+
+# ── Sistema ──
+*.log
+.DS_Store
+Thumbs.db

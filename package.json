@@ -1,0 +1,20 @@
+{
+  "name": "reels-con-ia-kit",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsx mcp/instagram-server.ts",
+    "test": "tsx scripts/test-connection.ts",
+    "refresh": "tsx scripts/refresh-token.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "@types/node": "^22.0.0"
+  }
+}

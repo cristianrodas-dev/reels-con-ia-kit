@@ -1,0 +1,267 @@
+{
+  "version": "1.0-es",
+  "nota": "26 fórmulas de gancho para Reels, adaptadas al español rioplatense desde instagram-agent-skill (MIT, Jake Schincariol). Un Reel tiene dos ganchos que disparan al mismo tiempo y no son la misma frase: lo primero que decís y lo primero que aparece en pantalla. El hablado tiene ~2 segundos. El de pantalla tiene ~1, porque se lee antes de escucharse. Cada fórmula trae plantilla, ejemplo (en el nicho de seguridad de cuentas), versión en pantalla, para qué sirve, cómo se arruina, y un regex `match` para clasificar ganchos ajenos.",
+  "orden_clasificacion": [1, 5, 4, 17, 23, 15, 6, 19, 3, 20, 22, 7, 2, 9, 10, 11, 14, 12, 16, 26, 25, 24, 8, 13, 18, 21],
+  "formulas": [
+    {
+      "id": 1,
+      "nombre": "Confesión de costo",
+      "plantilla": "{Monto específico} es lo que me costó {un error}.",
+      "ejemplo": "3 años de fotos es lo que me costó una contraseña repetida.",
+      "en_pantalla": "3 AÑOS DE FOTOS, PERDIDOS",
+      "sirve_para": "Confianza rápida. La gente termina los videos donde el que queda mal sos vos.",
+      "trampa": "Un costo falso. 'Me costó la tranquilidad' no es un número y todos lo escuchan.",
+      "match": "\\b(?:me|nos|le|les) cost(?:ó|aron)\\b|\\bes lo que me cost\\b|\\bperd(?:í|imos)\\b[^.!?]{0,25}\\d"
+    },
+    {
+      "id": 2,
+      "nombre": "Orden negativa",
+      "plantilla": "Dejá de {acción común}. Hacé {alternativa}.",
+      "ejemplo": "Dejá de usar tu fecha de nacimiento en la contraseña. Usá una frase.",
+      "en_pantalla": "DEJÁ DE HACER ESTO",
+      "sirve_para": "Cortar un hábito que el espectador sabe que tiene. Funciona por culpa reconocida.",
+      "trampa": "Prohibir algo que nadie hace. Si el 'dejá de' no pica, la alternativa no importa.",
+      "match": "^\\s*(?:dej(?:á|a) de|par(?:á|a) de|no (?:uses|hagas|pongas|compartas))\\b"
+    },
+    {
+      "id": 3,
+      "nombre": "Nadie te dice",
+      "plantilla": "Nadie te dice que {verdad incómoda sobre lo que quieren}.",
+      "ejemplo": "Nadie te dice que Instagram tarda 14 días en devolverte una cuenta robada.",
+      "en_pantalla": "LO QUE NADIE TE DICE",
+      "sirve_para": "Posicionarte como el que sabe lo de adentro. Funciona cuando la verdad duele un poco.",
+      "trampa": "Una verdad que sí te dicen. Si está en el primer resultado de Google, no es secreto.",
+      "match": "\\bnadie (?:te|les|nos) (?:dice|cuenta|avisa|explica)\\b|\\bnadie (?:habla|te habla) de\\b"
+    },
+    {
+      "id": 4,
+      "nombre": "El reemplazo",
+      "plantilla": "{Esto} reemplazó a {cosa cara} por {precio}.",
+      "ejemplo": "Esta app gratis reemplazó al SMS que te pueden interceptar.",
+      "en_pantalla": "GRATIS vs. $0 DE SEGURIDAD",
+      "sirve_para": "Utilidad inmediata. La gente guarda lo que le ahorra plata o riesgo.",
+      "trampa": "Reemplazar algo que nadie pagaba. Sin la cosa cara no hay contraste.",
+      "match": "\\breemplaz(?:ó|a|a a)\\b|\\ben vez de pagar\\b|\\bgratis\\b[^.!?]{0,30}\\b(?:en vez|en lugar)\\b"
+    },
+    {
+      "id": 5,
+      "nombre": "Colapso de tiempo",
+      "plantilla": "Esto me llevaba {mucho tiempo}. Ahora me lleva {poco tiempo}.",
+      "ejemplo": "Recuperar una cuenta me llevaba 3 semanas. Ahora 40 minutos.",
+      "en_pantalla": "3 SEMANAS → 40 MIN",
+      "sirve_para": "Promesa de atajo con números propios. Se lee de un vistazo en pantalla.",
+      "trampa": "Una proporción que no se cree. De 3 semanas a 2 segundos es humo.",
+      "match": "\\b(?:me|nos) (?:llevaba|tomaba|tardaba)\\b[^.!?]{0,30}\\b(?:ahora|hoy)\\b|\\bde \\d+ (?:horas|días|semanas|meses) a \\d+\\b"
+    },
+    {
+      "id": 6,
+      "nombre": "El comprobante",
+      "plantilla": "Hice {cosa} durante {N días}. Estos son los números reales.",
+      "ejemplo": "Reporté 40 cuentas falsas en 30 días. Esto fue lo que pasó.",
+      "en_pantalla": "40 REPORTES. 30 DÍAS.",
+      "sirve_para": "Credibilidad por volumen. Los números reales ganan a las promesas.",
+      "trampa": "Sin números al final. Si prometés el comprobante y no lo mostrás, es clickbait.",
+      "match": "\\bdurante \\d+ (?:días|semanas|meses)\\b|\\bestos son los (?:números|resultados|datos)\\b|\\b\\d+ días (?:haciendo|probando|usando)\\b"
+    },
+    {
+      "id": 7,
+      "nombre": "Mal y bien",
+      "plantilla": "Estás haciendo {cosa} mal, y no es tu culpa. {La solución}.",
+      "ejemplo": "Estás activando la verificación en dos pasos mal, y no es tu culpa.",
+      "en_pantalla": "LO HACÉS MAL (Y NO ES TU CULPA)",
+      "sirve_para": "Corregir sin humillar. 'No es tu culpa' baja la defensa y deja entrar la solución.",
+      "trampa": "Acusar sin absolver. 'Lo hacés mal' solo genera cierre de video.",
+      "match": "\\b(?:lo |la )?(?:estás|están|estas) haciendo\\b[^.!?]{0,20}\\bmal\\b|\\bno es tu culpa\\b|\\bhac(?:és|es) mal\\b"
+    },
+    {
+      "id": 8,
+      "nombre": "Filtración de adentro",
+      "plantilla": "Pasé {N años} {adentro de la cosa}. Esto es lo que nunca dijimos en voz alta.",
+      "ejemplo": "Pasé 5 años atendiendo cuentas hackeadas. Esto es lo que nadie admite.",
+      "en_pantalla": "5 AÑOS ADENTRO",
+      "sirve_para": "Autoridad por experiencia vivida. Nadie puede discutirte lo que viste.",
+      "trampa": "Inventar años. Si no estuviste adentro, no uses esta fórmula.",
+      "match": "\\bpasé \\d+ años\\b|\\btrabajé \\d+ años en\\b|\\bdesde adentro\\b"
+    },
+    {
+      "id": 9,
+      "nombre": "Robate esto",
+      "plantilla": "Robate este {artefacto}. Me llevó {tiempo} armarlo.",
+      "ejemplo": "Robate este checklist de 6 puntos. Me llevó 2 años armarlo.",
+      "en_pantalla": "ROBATE ESTO",
+      "sirve_para": "Guardados. El espectador siente que se lleva algo con valor y costo.",
+      "trampa": "Un artefacto sin costo visible. Si no decís cuánto te llevó, es un consejo más.",
+      "match": "^\\s*(?:robate|copiate|llevate|guardate) (?:este|esta|esto)\\b"
+    },
+    {
+      "id": 10,
+      "nombre": "Si te pasa esto, mirá",
+      "plantilla": "Si {situación específica}, esto de {tiempo corto} lo arregla.",
+      "ejemplo": "Si perdiste el acceso a tu cuenta, estos 4 pasos son lo primero.",
+      "en_pantalla": "¿PERDISTE TU CUENTA? 4 PASOS",
+      "sirve_para": "Filtrar al espectador exacto. El que está en esa situación no puede scrollear.",
+      "trampa": "Una situación vaga. 'Si tenés problemas con Instagram' no filtra a nadie.",
+      "match": "^\\s*si (?:te|tu|tus|vos|perdiste|tenés|tienes|alguien)\\b"
+    },
+    {
+      "id": 11,
+      "nombre": "Lista con favorito",
+      "plantilla": "{N} {cosas} que {resultado}. La número {k} es la que nadie usa.",
+      "ejemplo": "3 señales de que te hackearon Instagram. La tercera casi nadie la revisa.",
+      "en_pantalla": "3 SEÑALES. LA 3ª NADIE LA VE.",
+      "sirve_para": "Retención en el medio: anunciar un favorito da razón para quedarse pasado el tercer segundo.",
+      "trampa": "N mayor a 7. Nadie cree que tenés 9 buenas, y no las tenés.",
+      "match": "^\\s*(?:estas son\\s+|las\\s+)?\\d+\\s+\\w+|\\b(?:la|el) número \\d+\\b|\\b(?:tres|cuatro|cinco|siete|diez)\\s+\\w+\\s+(?:que|para|de)\\b"
+    },
+    {
+      "id": 12,
+      "nombre": "La objeción",
+      "plantilla": "\"{Objeción textual que dicen}\". Bien. Esta es la versión que funciona.",
+      "ejemplo": "\"A mí no me van a hackear\". Bien. Así es como entran igual.",
+      "en_pantalla": "\"A MÍ NO ME PASA\"",
+      "sirve_para": "Responder a lo que ya piensan. Citar la excusa exacta genera identificación instantánea.",
+      "trampa": "Una objeción que nadie dice. Tiene que sonar a comentario real.",
+      "match": "^\\s*[\"“«][^\"”»]{8,80}[\"”»]"
+    },
+    {
+      "id": 13,
+      "nombre": "Antes y después en pantalla",
+      "plantilla": "{Mostrás lo viejo}. {Mostrás lo nuevo}. {Una frase sobre la palanca}.",
+      "ejemplo": "Así se ve una cuenta clonada. Así se ve la real. Fijate en este detalle.",
+      "en_pantalla": "FALSA | REAL",
+      "sirve_para": "Visual puro. El contraste trabaja antes que la voz.",
+      "trampa": "Sin diferencia visible. Si hay que explicar la diferencia, no es antes/después.",
+      "match": "\\bantes\\b[^.!?]{0,30}\\bdespués\\b|\\basí se ve\\b[^.!?]{0,40}\\basí se ve\\b"
+    },
+    {
+      "id": 14,
+      "nombre": "El llamado directo",
+      "plantilla": "{Grupo específico}, esto es lo que venís ignorando.",
+      "ejemplo": "Si vendés por Instagram, esto es lo que venís ignorando.",
+      "en_pantalla": "SI VENDÉS POR IG, LEÉ ESTO",
+      "sirve_para": "Elegir a tu espectador por nombre. Los demás scrollean; el nombrado se queda.",
+      "trampa": "Un grupo demasiado amplio. 'Emprendedores' no es nadie.",
+      "match": "^\\s*(?:si (?:sos|tenés|vendés|trabajás|usás)|para los que|los que)\\b"
+    },
+    {
+      "id": 15,
+      "nombre": "El historial de fracasos",
+      "plantilla": "Mis primeros {N} {intentos} no sirvieron. Esto cambió en el {N+1}.",
+      "ejemplo": "Mis primeros 6 reclamos a Instagram fueron ignorados. El séptimo funcionó.",
+      "en_pantalla": "6 IGNORADOS. EL 7º FUNCIONÓ.",
+      "sirve_para": "Humanidad + método. El fracaso previo hace creíble el éxito.",
+      "trampa": "Fracasos inventados. Se nota cuando no hay detalle en ninguno.",
+      "match": "\\bmis primer(?:os|as) \\d+\\b|\\b(?:el|la) (?:séptim|octav|quint|décim)\\w+ (?:funcionó|sí)\\b"
+    },
+    {
+      "id": 16,
+      "nombre": "La pregunta textual",
+      "plantilla": "\"{Pregunta exactamente como la hicieron}\". Me la hacen todas las semanas.",
+      "ejemplo": "\"¿Cómo sé si me están espiando el WhatsApp?\". Me lo preguntan todas las semanas.",
+      "en_pantalla": "ME LO PREGUNTAN SIEMPRE",
+      "sirve_para": "Prueba social de que el problema existe. Si muchos preguntan, el espectador no está solo.",
+      "trampa": "Una pregunta que nadie haría con esas palabras. Tiene que sonar a DM real.",
+      "match": "^\\s*[\"“«¿][^\"”»]{8,90}\\?[\"”»]?"
+    },
+    {
+      "id": 17,
+      "nombre": "Cara a cara",
+      "plantilla": "{A} contra {B}. Probé los dos durante {tiempo} y no estuvo cerca.",
+      "ejemplo": "Código por SMS contra app de autenticación. Probé los dos y no estuvo cerca.",
+      "en_pantalla": "SMS vs. APP",
+      "sirve_para": "Decisiones. El espectador que está eligiendo entre dos no puede irse sin el veredicto.",
+      "trampa": "Comparar cosas que nadie compara. Tienen que ser las dos opciones reales.",
+      "match": "\\b\\w+ (?:contra|vs\\.?|versus) \\w+\\b|\\bprobé (?:los|las) dos\\b"
+    },
+    {
+      "id": 18,
+      "nombre": "Demo en frío",
+      "plantilla": "{Empezás a mitad de la acción, ya haciéndolo}. Mirá lo que hace esto.",
+      "ejemplo": "[Ya en pantalla, tocando Configuración] Mirá lo que aparece acá.",
+      "en_pantalla": "MIRÁ ESTO",
+      "sirve_para": "Tutoriales. La acción en el primer frame vale más que cualquier frase.",
+      "trampa": "Empezar con la cara hablando. Si la demo arranca en el segundo 4, no es demo en frío.",
+      "match": "^\\s*(?:mirá|mira|fijate|fíjate) (?:lo que|esto|acá|aquí)\\b"
+    },
+    {
+      "id": 19,
+      "nombre": "La fecha límite",
+      "plantilla": "{Cosa} cambia el {fecha}. Hacé {acción} antes.",
+      "ejemplo": "Instagram cambia la recuperación de cuentas el 1 de noviembre. Hacé esto antes.",
+      "en_pantalla": "ANTES DEL 1/11",
+      "sirve_para": "Urgencia legítima. La fecha real convierte 'algún día' en 'hoy'.",
+      "trampa": "Fecha inventada. Si no hay cambio real, es manipulación y se nota.",
+      "match": "\\b(?:antes del|hasta el|el) \\d{1,2} de \\w+\\b|\\bcambia el\\b|\\bvence\\b"
+    },
+    {
+      "id": 20,
+      "nombre": "Permiso",
+      "plantilla": "No necesitás {lo que todos dicen que necesitás}.",
+      "ejemplo": "No necesitás un antivirus pago para no caer en una estafa.",
+      "en_pantalla": "NO NECESITÁS ESO",
+      "sirve_para": "Alivio. Quitar una carga percibida genera gratitud y guardado.",
+      "trampa": "Liberar de algo que sí hace falta. La credibilidad se pierde en un comentario.",
+      "match": "^\\s*no (?:necesitás|necesitas|hace falta|te hace falta)\\b"
+    },
+    {
+      "id": 21,
+      "nombre": "Arranque a mitad de frase",
+      "plantilla": "...y ahí fue cuando {el giro}.",
+      "ejemplo": "...y ahí fue cuando me di cuenta de que el mail de Instagram era falso.",
+      "en_pantalla": "...Y AHÍ ME DI CUENTA",
+      "sirve_para": "Curiosidad por omisión. El cerebro necesita saber qué pasó antes.",
+      "trampa": "Un giro que no es giro. Lo que viene después tiene que justificar el corte.",
+      "match": "^\\s*(?:\\.\\.\\.|…)\\s*\\w|^\\s*y (?:ahí|entonces|justo) (?:fue|es) cuando\\b"
+    },
+    {
+      "id": 22,
+      "nombre": "Vuelta contraria",
+      "plantilla": "{Frase conocida, invertida}.",
+      "ejemplo": "La contraseña más segura es la que no te acordás.",
+      "en_pantalla": "LA CONTRASEÑA QUE NO TE ACORDÁS",
+      "sirve_para": "Fricción mental. Lo contraintuitivo obliga a quedarse a ver la explicación.",
+      "trampa": "Contradecir por contradecir. Tiene que haber una verdad atrás de la vuelta.",
+      "match": "\\b(?:más|mejor|peor) \\w+ es (?:la|el) que no\\b|\\bno es lo que (?:pensás|piensas|creés|crees)\\b"
+    },
+    {
+      "id": 23,
+      "nombre": "La estadística",
+      "plantilla": "El {N}% de {grupo} {dato sorprendente}.",
+      "ejemplo": "El 80% de las cuentas robadas usaban la misma contraseña en otro lado.",
+      "en_pantalla": "80% MISMA CONTRASEÑA",
+      "sirve_para": "Autoridad instantánea. Un porcentaje concreto se cree antes que una opinión.",
+      "trampa": "Un número inventado. Si no tenés la fuente, no uses esta fórmula.",
+      "match": "\\b(?:el |un )?\\d{1,3}\\s?% de\\b|\\b\\d+ de cada \\d+\\b"
+    },
+    {
+      "id": 24,
+      "nombre": "La revelación",
+      "plantilla": "Esta es la nueva {cosa}.",
+      "ejemplo": "Esta es la nueva estafa que llega por DM y parece de Instagram.",
+      "en_pantalla": "LA NUEVA ESTAFA",
+      "sirve_para": "Novedad. 'Nueva' obliga a chequear si ya lo sabías.",
+      "trampa": "Algo que no es nuevo. El primer comentario va a decir 'esto es de 2019'.",
+      "match": "^\\s*(?:esta es|este es|esto es) (?:la|el) nuev[oa]\\b|\\bla nueva (?:estafa|forma|manera)\\b"
+    },
+    {
+      "id": 25,
+      "nombre": "El resultado de otro",
+      "plantilla": "Hubo una {persona} que {resultado} en {tiempo}.",
+      "ejemplo": "Una clienta recuperó su cuenta de 40 mil seguidores en 48 horas con esto.",
+      "en_pantalla": "40K SEGUIDORES EN 48 HS",
+      "sirve_para": "Prueba sin alardear. El éxito ajeno es más creíble que el propio.",
+      "trampa": "Un caso inventado o sin detalle. Necesita un número y un tiempo.",
+      "match": "\\b(?:un|una) (?:cliente|clienta|seguidor|seguidora|chica|chico|persona|señora|señor)\\b[^.!?]{0,40}\\b(?:en \\d+|logró|recuperó|consiguió)\\b"
+    },
+    {
+      "id": 26,
+      "nombre": "El superlativo",
+      "plantilla": "El {más rápido / más grande / único} {cosa} es {la respuesta}.",
+      "ejemplo": "La forma más rápida de saber si te hackearon está en un solo menú.",
+      "en_pantalla": "LA FORMA MÁS RÁPIDA",
+      "sirve_para": "Promesa de eficiencia. 'El único' y 'el más rápido' se guardan.",
+      "trampa": "Superlativo sin respaldo. 'El mejor' sin explicar por qué es ruido.",
+      "match": "\\b(?:la|el) (?:única|único|más rápid[oa]|más fácil|más simple|más segur[oa]|mejor) (?:forma|manera|modo|cosa)\\b"
+    }
+  ]
+}

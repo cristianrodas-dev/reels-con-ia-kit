@@ -1,0 +1,95 @@
+{
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "durationInFrames": 784,
+  "safeZone": {
+    "top": 230,
+    "bottom": 1440,
+    "right": 960,
+    "left": 120
+  },
+  "beats": [
+    {
+      "id": "beat-1",
+      "label": "GANCHO",
+      "from": 0,
+      "durationInFrames": 81,
+      "spoken": "3 señales de que te hackearon Instagram.",
+      "onScreen": [
+        "3 SEÑALES DE HACKEO"
+      ]
+    },
+    {
+      "id": "beat-2",
+      "label": "CUERPO",
+      "from": 81,
+      "durationInFrames": 70,
+      "spoken": "La tercera casi nadie la revisa.",
+      "onScreen": [
+        "LA 3ª",
+        "NADIE LA VE"
+      ]
+    },
+    {
+      "id": "beat-3",
+      "label": "CUERPO",
+      "from": 151,
+      "durationInFrames": 116,
+      "spoken": "Uno: un mail de cambio de contraseña que no pediste.",
+      "onScreen": [
+        "1. MAIL QUE NO PEDISTE"
+      ]
+    },
+    {
+      "id": "beat-4",
+      "label": "CUERPO",
+      "from": 267,
+      "durationInFrames": 70,
+      "spoken": "Dos: seguidos que tú no seguiste.",
+      "onScreen": [
+        "2. SEGUIDOS FANTASMA"
+      ]
+    },
+    {
+      "id": "beat-5",
+      "label": "MEDIO",
+      "from": 337,
+      "durationInFrames": 93,
+      "spoken": "Tres: entra a Actividad de inicio de sesión.",
+      "onScreen": [
+        "3. ACTIVIDAD DE INICIO DE SESIÓN"
+      ]
+    },
+    {
+      "id": "beat-6",
+      "label": "CUERPO",
+      "from": 430,
+      "durationInFrames": 128,
+      "spoken": "Si hay un celular que no es tuyo, ya están adentro.",
+      "onScreen": [
+        "UN CELULAR AJENO = YA ENTRARON"
+      ]
+    },
+    {
+      "id": "beat-7",
+      "label": "CUERPO",
+      "from": 557,
+      "durationInFrames": 93,
+      "spoken": "¿Ves una sola de las 3? Escríbeme SOS.",
+      "onScreen": [
+        "ESCRÍBEME \"SOS\""
+      ]
+    },
+    {
+      "id": "beat-8",
+      "label": "CTA",
+      "from": 650,
+      "durationInFrames": 116,
+      "spoken": "Y mándaselo a quien repite la contraseña: son 3 señales.",
+      "onScreen": [
+        "MÁNDASELO"
+      ]
+    }
+  ]
+}
