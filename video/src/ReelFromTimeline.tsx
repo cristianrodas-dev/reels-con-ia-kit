@@ -45,6 +45,7 @@ import {
   shakeAt,
   useBrandFonts,
 } from "./Cinematic";
+import { FakeMail, type MailHighlight } from "./FakeMail";
 
 export type Beat = {
   id: string;
@@ -55,6 +56,8 @@ export type Beat = {
   onScreen: string[];
   /** Clip de audio de este beat en /public (lo genera tts.py). */
   audio?: string;
+  /** Capa visual extra del beat (ej. mail de ejemplo con un detalle resaltado). */
+  visual?: { type: "fakeMail"; highlight?: MailHighlight };
 };
 
 export type Timeline = {
@@ -150,12 +153,13 @@ const Progress: React.FC<{ theme: Theme }> = ({ theme }) => {
 };
 
 /** Tarjeta de texto en pantalla: entra con spring, sale con fade. */
-const Card: React.FC<{ lines: string[]; label: string; theme: Theme; durationInFrames: number; cinematic?: boolean }> = ({
+const Card: React.FC<{ lines: string[]; label: string; theme: Theme; durationInFrames: number; cinematic?: boolean; compact?: boolean }> = ({
   lines,
   label,
   theme,
   durationInFrames,
   cinematic,
+  compact,
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -172,16 +176,16 @@ const Card: React.FC<{ lines: string[]; label: string; theme: Theme; durationInF
 
   // Tamaño según largo: el gancho más grande, el CTA con color de acento.
   const longest = Math.max(...lines.map((l) => l.length), 1);
-  const fontSize = isHook ? (longest > 18 ? 96 : 120) : longest > 24 ? 72 : 88;
+  const fontSize = compact ? 58 : isHook ? (longest > 18 ? 96 : 120) : longest > 24 ? 72 : 88;
 
   return (
     <div
       style={{
         position: "absolute",
-        top: SAFE.top,
+        top: compact ? SAFE.top + 110 : SAFE.top,
         left: SAFE.left,
         width: SAFE.right - SAFE.left,
-        height: SAFE.bottom - SAFE.top - 320, // deja lugar al subtítulo
+        height: compact ? 220 : SAFE.bottom - SAFE.top - 320, // compacto: deja lugar a la capa visual
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -305,8 +309,9 @@ export const ReelFromTimeline: React.FC<ReelProps> = ({
         {shifted.map((b) => (
           <Sequence key={b.id} from={b.from} durationInFrames={b.durationInFrames} name={`${b.label} ${b.id}`}>
             {b.onScreen.length > 0 && (
-              <Card lines={b.onScreen} label={b.label} theme={theme} durationInFrames={b.durationInFrames} cinematic={cinematic} />
+              <Card lines={b.onScreen} label={b.label} theme={theme} durationInFrames={b.durationInFrames} cinematic={cinematic} compact={!!b.visual} />
             )}
+            {b.visual?.type === "fakeMail" && <FakeMail highlight={b.visual.highlight ?? "none"} />}
             {cinematic && <GlitchBars len={b.label.startsWith("GANCHO") ? 8 : 3} />}
             {cinematic && b.label.includes("CTA") && <ImpactFlash />}
             <Subtitle text={b.spoken} theme={theme} />
