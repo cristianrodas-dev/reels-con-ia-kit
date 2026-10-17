@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "buildCommand": null,
+  "outputDirectory": null,
+  "functions": {
+    "api/*.ts": {
+      "maxDuration": 10,
+      "memory": 256,
+      "runtime": "nodejs20.x"
+    }
+  }
+}
