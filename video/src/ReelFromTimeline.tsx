@@ -155,13 +155,14 @@ const Progress: React.FC<{ theme: Theme }> = ({ theme }) => {
 };
 
 /** Tarjeta de texto en pantalla: entra con spring, sale con fade. */
-const Card: React.FC<{ lines: string[]; label: string; theme: Theme; durationInFrames: number; cinematic?: boolean; compact?: boolean }> = ({
+const Card: React.FC<{ lines: string[]; label: string; theme: Theme; durationInFrames: number; cinematic?: boolean; compact?: boolean; anchorTop?: boolean }> = ({
   lines,
   label,
   theme,
   durationInFrames,
   cinematic,
   compact,
+  anchorTop,
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -184,12 +185,14 @@ const Card: React.FC<{ lines: string[]; label: string; theme: Theme; durationInF
     <div
       style={{
         position: "absolute",
-        top: compact ? SAFE.top + 110 : SAFE.top,
+        // anchorTop: con contador, todos los títulos arrancan en la misma línea (y = 450)
+        // en vez de centrarse según cuántas líneas tengan; así no "saltan" entre beats.
+        top: compact ? SAFE.top + 110 : anchorTop ? SAFE.top + 220 : SAFE.top,
         left: SAFE.left,
         width: SAFE.right - SAFE.left,
-        height: compact ? 220 : SAFE.bottom - SAFE.top - 320, // compacto: deja lugar a la capa visual
+        height: compact ? 220 : anchorTop ? SAFE.bottom - SAFE.top - 540 : SAFE.bottom - SAFE.top - 320, // compacto: deja lugar a la capa visual
         display: "flex",
-        alignItems: "center",
+        alignItems: anchorTop && !compact ? "flex-start" : "center",
         justifyContent: "center",
         opacity: fadeOut,
         transform: `translateY(${y}px) scale(${scale})`,
@@ -329,6 +332,20 @@ export const ReelFromTimeline: React.FC<ReelProps> = ({
   const shake = { x: s1.x + s1b.x + s2.x, y: s1.y + s1b.y + s2.y, r: s1.r + s1b.r + s2.r };
   const shifted = beats.map((b) => ({ ...b, from: b.from + intro }));
 
+  // Contador: beats seguidos con el mismo `step` forman UN tramo. El número aparece
+  // una sola vez (cuando la voz dice "uno", "dos", "tres") y queda fijo hasta el siguiente.
+  const stepSegments: { step: string; from: number; durationInFrames: number }[] = [];
+  for (const b of shifted) {
+    if (!b.step) continue;
+    const last = stepSegments[stepSegments.length - 1];
+    if (last && last.step === b.step && last.from + last.durationInFrames === b.from) {
+      last.durationInFrames += b.durationInFrames;
+    } else {
+      stepSegments.push({ step: b.step, from: b.from, durationInFrames: b.durationInFrames });
+    }
+  }
+  const hasSteps = stepSegments.length > 0;
+
   return (
     <AbsoluteFill style={{ background: theme.bg }}>
       <AbsoluteFill style={{ transform: `translate(${shake.x}px, ${shake.y}px) rotate(${shake.r}deg) scale(${cinematic ? 1.04 : 1})` }}>
@@ -347,15 +364,20 @@ export const ReelFromTimeline: React.FC<ReelProps> = ({
         {shifted.map((b) => (
           <Sequence key={b.id} from={b.from} durationInFrames={b.durationInFrames} name={`${b.label} ${b.id}`}>
             {b.onScreen.length > 0 && (
-              <Card lines={b.onScreen} label={b.label} theme={theme} durationInFrames={b.durationInFrames} cinematic={cinematic} compact={!!b.visual} />
+              <Card lines={b.onScreen} label={b.label} theme={theme} durationInFrames={b.durationInFrames} cinematic={cinematic} compact={!!b.visual} anchorTop={hasSteps} />
             )}
             {b.visual?.type === "fakeMail" && <FakeMail highlight={b.visual.highlight ?? "none"} />}
-            {b.step && <StepPill step={b.step} theme={theme} />}
             {cinematic && <GlitchBars len={b.label.startsWith("GANCHO") ? 8 : 3} />}
             {cinematic && b.label.includes("CTA") && <ImpactFlash />}
             <Subtitle text={b.spoken} theme={theme} />
             {/* Voz artificial: un clip por beat, arranca con el beat */}
             {b.audio && !voice && <Audio src={staticFile(b.audio)} />}
+          </Sequence>
+        ))}
+
+        {stepSegments.map((s) => (
+          <Sequence key={`step-${s.from}`} from={s.from} durationInFrames={s.durationInFrames} name={`Contador ${s.step}`}>
+            <StepPill step={s.step} theme={theme} />
           </Sequence>
         ))}
       </AbsoluteFill>
