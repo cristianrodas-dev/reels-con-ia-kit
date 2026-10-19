@@ -58,6 +58,8 @@ export type Beat = {
   audio?: string;
   /** Capa visual extra del beat (ej. mail de ejemplo con un detalle resaltado). */
   visual?: { type: "fakeMail"; highlight?: MailHighlight };
+  /** Contador de pasos visible arriba a la derecha, ej. "1/3". Mantiene al espectador hasta el final. */
+  step?: string;
 };
 
 export type Timeline = {
@@ -223,6 +225,42 @@ const Card: React.FC<{ lines: string[]; label: string; theme: Theme; durationInF
   );
 };
 
+/** Contador "1/3" centrado bajo la barra de progreso. Entra con un pop corto. */
+const StepPill: React.FC<{ step: string; theme: Theme }> = ({ step, theme }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const pop = spring({ frame, fps, config: { damping: 10, stiffness: 220, mass: 0.6 } });
+  return (
+    <div
+      style={{
+        position: "absolute",
+        top: SAFE.top + 110, // debajo de la marca PROTOCOLO SOS, encima del título
+        left: SAFE.left,
+        width: SAFE.right - SAFE.left,
+        display: "flex",
+        justifyContent: "center",
+      }}
+    >
+      <div
+        style={{
+          fontFamily: theme.font,
+          fontWeight: 900,
+          fontSize: 46,
+          letterSpacing: 4,
+          color: "#fff",
+          background: "#D32F2F",
+          padding: "8px 30px",
+          borderRadius: 999,
+          boxShadow: "0 8px 30px rgba(211,47,47,0.55)",
+          transform: `scale(${interpolate(pop, [0, 1], [0.6, 1])})`,
+        }}
+      >
+        {step}
+      </div>
+    </div>
+  );
+};
+
 /** Subtítulo quemado con la línea hablada. La mayoría mira sin sonido. */
 const Subtitle: React.FC<{ text: string; theme: Theme }> = ({ text, theme }) => {
   const frame = useCurrentFrame();
@@ -312,6 +350,7 @@ export const ReelFromTimeline: React.FC<ReelProps> = ({
               <Card lines={b.onScreen} label={b.label} theme={theme} durationInFrames={b.durationInFrames} cinematic={cinematic} compact={!!b.visual} />
             )}
             {b.visual?.type === "fakeMail" && <FakeMail highlight={b.visual.highlight ?? "none"} />}
+            {b.step && <StepPill step={b.step} theme={theme} />}
             {cinematic && <GlitchBars len={b.label.startsWith("GANCHO") ? 8 : 3} />}
             {cinematic && b.label.includes("CTA") && <ImpactFlash />}
             <Subtitle text={b.spoken} theme={theme} />
