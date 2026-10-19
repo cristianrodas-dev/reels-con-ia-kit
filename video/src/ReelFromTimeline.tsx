@@ -187,10 +187,11 @@ const Card: React.FC<{ lines: string[]; label: string; theme: Theme; durationInF
         position: "absolute",
         // anchorTop: con contador, todos los títulos arrancan en la misma línea (y = 450)
         // en vez de centrarse según cuántas líneas tengan; así no "saltan" entre beats.
-        top: compact ? SAFE.top + 110 : anchorTop ? SAFE.top + 220 : SAFE.top,
+        // Con contador (anchorTop) la tarjeta compacta baja para no quedar tapada por la pastilla.
+        top: compact ? (anchorTop ? SAFE.top + 175 : SAFE.top + 110) : anchorTop ? SAFE.top + 220 : SAFE.top,
         left: SAFE.left,
         width: SAFE.right - SAFE.left,
-        height: compact ? 220 : anchorTop ? SAFE.bottom - SAFE.top - 540 : SAFE.bottom - SAFE.top - 320, // compacto: deja lugar a la capa visual
+        height: compact ? (anchorTop ? 190 : 220) : anchorTop ? SAFE.bottom - SAFE.top - 540 : SAFE.bottom - SAFE.top - 320, // compacto: deja lugar a la capa visual
         display: "flex",
         alignItems: anchorTop && !compact ? "flex-start" : "center",
         justifyContent: "center",
@@ -237,7 +238,7 @@ const StepPill: React.FC<{ step: string; theme: Theme }> = ({ step, theme }) => 
     <div
       style={{
         position: "absolute",
-        top: SAFE.top + 110, // debajo de la marca PROTOCOLO SOS, encima del título
+        top: SAFE.top + 100, // debajo de la marca PROTOCOLO SOS, encima del título (termina ~y 400)
         left: SAFE.left,
         width: SAFE.right - SAFE.left,
         display: "flex",

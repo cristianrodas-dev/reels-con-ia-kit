@@ -37,7 +37,7 @@ import unicodedata
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-from beats import parse_script, FPS  # noqa: E402
+from beats import parse_script, parse_extras, apply_extras, FPS  # noqa: E402
 
 TAIL_FRAMES = 18
 WORD_RE = re.compile(r"[a-z0-9ñ]+")
@@ -197,7 +197,7 @@ def build_timeline(items, spans, audio_rel, fps=FPS):
     return {
         "fps": fps, "width": 1080, "height": 1920,
         "durationInFrames": total,
-        "safeZone": {"top": 230, "bottom": 1440, "right": 850},
+        "safeZone": {"top": 230, "bottom": 1440, "left": 120, "right": 960},
         "voiceoverSrc": audio_rel,
         "voice": {"engine": "grabada", "alignedWith": "faster-whisper"},
         "beats": beats,
@@ -215,7 +215,8 @@ def main():
                     help="usar la toma entera tal cual (default: recorta a los beats alineados)")
     args = ap.parse_args()
 
-    items = [(l, s) for l, s in parse_script(open(args.guion, encoding="utf-8").read())]
+    raw = open(args.guion, encoding="utf-8").read()
+    items = [(l, s) for l, s in parse_script(raw)]
     if not items:
         raise SystemExit("guión vacío")
 
@@ -260,6 +261,7 @@ def main():
             print("\n(ffmpeg no encontrado: se usa la toma entera sin recortar)")
 
     tl = build_timeline(items, spans, audio_rel, fps=args.fps)
+    apply_extras(tl["beats"], parse_extras(raw))
     tl_path = os.path.join(out_dir, "timeline.json")
     with open(tl_path, "w", encoding="utf-8") as f:
         json.dump(tl, f, indent=2, ensure_ascii=False)

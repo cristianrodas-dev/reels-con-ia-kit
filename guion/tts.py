@@ -41,7 +41,7 @@ import urllib.request
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-from beats import parse_script, FPS  # noqa: E402
+from beats import parse_script, parse_extras, apply_extras, FPS  # noqa: E402
 
 GAP_FRAMES = 6        # silencio entre beats (0.2 s a 30 fps)
 TAIL_FRAMES = 18      # cola al final del video (0.6 s)
@@ -379,7 +379,7 @@ def build_timeline(items, durations, audio_rel, ext, engine, voice, fps=FPS):
     return {
         "fps": fps, "width": 1080, "height": 1920,
         "durationInFrames": clock + TAIL_FRAMES,
-        "safeZone": {"top": 230, "bottom": 1440, "right": 850},
+        "safeZone": {"top": 230, "bottom": 1440, "left": 120, "right": 960},
         "voice": {"engine": engine, "voice": voice},
         "beats": beats,
     }
@@ -454,6 +454,7 @@ def main():
         print(f"  beat-{i:<2} {d:5.2f}s  {spoken[:70]}{flag}")
 
     tl = build_timeline(items, durations, audio_rel, engine.ext, args.engine, voice, fps=args.fps)
+    apply_extras(tl["beats"], parse_extras(raw))
     tl_path = os.path.join(out_dir, "timeline.json")
     with open(tl_path, "w", encoding="utf-8") as f:
         json.dump(tl, f, indent=2, ensure_ascii=False)

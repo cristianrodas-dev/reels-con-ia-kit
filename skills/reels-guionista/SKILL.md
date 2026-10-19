@@ -75,11 +75,18 @@ Lo que suele funcionar en nichos de "problema urgente": la amenaza concreta ("as
 ÚLTIMA     LOOP       repetir una palabra del gancho.
 ```
 
-Formato (un beat por línea; `>` = texto en pantalla; `*palabra*` = resaltada):
+Formato (un beat por línea; `>` = texto en pantalla; `*palabra*` = resaltada; `@` = instrucción de video):
 ```
 3 señales de que te hackearon Instagram.
 > 3 SEÑALES DE *HACKEO*
+Uno: el remitente no termina en mail punto instagram punto com.
+> *REMITENTE*
+@paso 1/3
+@mail remitente
 ```
+
+- `@paso N/T`: contador rojo bajo la marca. Úsalo en listas de 2-3 ítems para que miren hasta el final. Con contador, el título no repite el número ("REMITENTE", no "1. REMITENTE").
+- `@mail remitente|apuro|link|nada`: mail de ejemplo (sello EJEMPLO) con ese detalle resaltado.
 
 Reglas:
 - Una idea por Reel; máximo 3 ítems por lista.

@@ -22,6 +22,10 @@ Formato del guión (un beat por línea):
 Las líneas que empiezan con ">" son texto en pantalla del beat anterior.
 No se hablan, no suman tiempo, y van al JSON de Remotion como `onScreen`.
 
+Las líneas que empiezan con "@" son instrucciones de video del beat anterior:
+    @paso 1/3            contador rojo "1/3" bajo la marca (queda fijo hasta el siguiente)
+    @mail remitente      mail de ejemplo con el remitente resaltado (también: apuro, link, nada)
+
 Uso
   python3 beats.py guion.txt
   python3 beats.py guion.txt --target 20
@@ -87,8 +91,47 @@ def parse_script(raw):
             if out:
                 out[-1][1].append(line.lstrip("> ").strip())
             continue
+        if line.startswith("@"):
+            continue  # instrucción de video: la lee parse_extras
         out.append([line, []])
     return out
+
+
+MAIL_HIGHLIGHT = {"remitente": "sender", "apuro": "urgency", "link": "link", "nada": "none"}
+
+
+def parse_extras(raw):
+    """Una entrada por línea hablada con las instrucciones "@" que la siguen.
+
+    Devuelve dicts listos para mezclar en cada beat del JSON de Remotion:
+    {"step": "1/3"} y/o {"visual": {"type": "fakeMail", "highlight": "sender"}}.
+    """
+    out = []
+    for line in raw.splitlines():
+        line = line.strip()
+        if not line or line.startswith(">"):
+            continue
+        if not line.startswith("@"):
+            out.append({})
+            continue
+        if not out:
+            continue
+        cmd, _, arg = line[1:].strip().partition(" ")
+        cmd, arg = cmd.lower(), arg.strip().lower()
+        if cmd == "paso" and re.fullmatch(r"\d{1,2}/\d{1,2}", arg):
+            out[-1]["step"] = arg
+        elif cmd == "mail":
+            out[-1]["visual"] = {"type": "fakeMail", "highlight": MAIL_HIGHLIGHT.get(arg, "none")}
+        else:
+            print(f"⚠️  instrucción desconocida ignorada: {line}", file=sys.stderr)
+    return out
+
+
+def apply_extras(beats, extras):
+    """Agrega step/visual a cada beat (mismo orden que las líneas habladas)."""
+    for beat, extra in zip(beats, extras):
+        beat.update(extra)
+    return beats
 
 
 def split_beats(items, wps):
@@ -230,7 +273,7 @@ def to_remotion(a, fps=FPS, tail_seconds=0.6):
         "width": 1080,
         "height": 1920,
         "durationInFrames": total_frames,
-        "safeZone": {"top": 230, "bottom": 1440, "right": 850},
+        "safeZone": {"top": 230, "bottom": 1440, "left": 120, "right": 960},
         "beats": seqs,
     }
 
