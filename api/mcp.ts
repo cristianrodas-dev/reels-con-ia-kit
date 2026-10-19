@@ -1,7 +1,11 @@
 /**
  * Instagram MCP — Vercel Serverless Endpoint
  * Protocolo: JSON-RPC 2.0 (MCP over HTTP)
- * Autenticación: Authorization: Bearer <MCP_SECRET>
+ * Autenticación (una de las dos):
+ *   - Header  Authorization: Bearer <MCP_SECRET>      (clientes que permiten headers)
+ *   - URL     https://<proyecto>.vercel.app/mcp/<MCP_SECRET>  (conector de la app de Claude,
+ *             que no deja agregar headers; vercel.json reescribe esa ruta a /api/mcp)
+ *   La clave se compara a tiempo constante y nunca se devuelve ni se registra.
  *
  * Herramientas disponibles:
  *   list_recent_media · get_media_insights · get_account_insights
@@ -13,6 +17,7 @@
  */
 
 import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { createHash, timingSafeEqual } from "node:crypto";
 
 // ─── Entorno ──────────────────────────────────────────────────────────────────
 const IG_USER_ID = process.env.IG_USER_ID!;
@@ -20,6 +25,35 @@ const IG_ACCESS_TOKEN = process.env.IG_ACCESS_TOKEN!;
 const IG_API_VERSION = process.env.IG_API_VERSION ?? "v22.0";
 const MCP_SECRET = process.env.MCP_SECRET!;
 const BASE = `https://graph.instagram.com/${IG_API_VERSION}`;
+
+// ─── Seguridad ────────────────────────────────────────────────────────────────
+/** Error de la API de Instagram: su mensaje es seguro de mostrar (sin token). */
+class IgError extends Error {}
+
+/** Borra el token de cualquier texto antes de mostrarlo o registrarlo. */
+const scrub = (t: string) => (IG_ACCESS_TOKEN ? t.split(IG_ACCESS_TOKEN).join("***") : t);
+
+/** Compara dos claves a tiempo constante (hash previo: mismo largo siempre). */
+function sameSecret(given: string, expected: string): boolean {
+  const a = createHash("sha256").update(given).digest();
+  const b = createHash("sha256").update(expected).digest();
+  return timingSafeEqual(a, b);
+}
+
+/** Los IDs de Instagram son solo dígitos: evita que un argumento cambie la ruta pedida. */
+function igId(v: unknown, campo: string): string {
+  const s = String(v ?? "").trim();
+  if (!/^\d{5,25}$/.test(s)) throw new IgError(`${campo} inválido: debe ser un ID numérico de Instagram.`);
+  return s;
+}
+
+/** Solo URLs https públicas para videos y portadas. */
+function httpsUrl(v: unknown, campo: string): string {
+  let u: URL;
+  try { u = new URL(String(v ?? "")); } catch { throw new IgError(`${campo} inválido.`); }
+  if (u.protocol !== "https:") throw new IgError(`${campo} debe empezar con https://`);
+  return u.toString();
+}
 
 // ─── Instagram API ─────────────────────────────────────────────────────────────
 async function ig(path: string, method = "GET", body?: object): Promise<any> {
@@ -35,7 +69,7 @@ async function ig(path: string, method = "GET", body?: object): Promise<any> {
   });
 
   const data = (await res.json()) as any;
-  if (data?.error) throw new Error(`Instagram: ${data.error.message} (code ${data.error.code})`);
+  if (data?.error) throw new IgError(`Instagram: ${data.error.message} (code ${data.error.code})`);
   return data;
 }
 
@@ -160,7 +194,7 @@ const TOOLS = [
 // ─── Handlers de cada herramienta ────────────────────────────────────────────
 async function handleListRecentMedia({ limit = 10 }: any): Promise<string> {
   const data = await ig(
-    `/${IG_USER_ID}/media?fields=id,media_type,media_product_type,timestamp,caption,like_count,comments_count,permalink&limit=${Math.min(limit, 20)}`
+    `/${IG_USER_ID}/media?fields=id,media_type,media_product_type,timestamp,caption,like_count,comments_count,permalink&limit=${Math.max(1, Math.min(Math.floor(Number(limit)) || 10, 20))}`
   );
   const lines = (data.data ?? []).map((m: any) => {
     const kind = m.media_product_type === "REELS" ? "REEL" : m.media_type;
@@ -174,7 +208,8 @@ async function handleListRecentMedia({ limit = 10 }: any): Promise<string> {
   return lines.join("\n\n") || "No hay publicaciones.";
 }
 
-async function handleGetMediaInsights({ media_id }: any): Promise<string> {
+async function handleGetMediaInsights({ media_id: raw }: any): Promise<string> {
+  const media_id = igId(raw, "media_id");
   const ins = await fetchInsightsFor(media_id);
   const lines = Object.entries(ins).map(([k, v]) => `${k}: ${v}`);
   return `📊 Insights de ${media_id}:\n${lines.join("\n")}`;
@@ -290,8 +325,13 @@ async function handleSubmitReel({
   cover_url,
   share_to_feed = true,
 }: any): Promise<string> {
-  const params: any = { media_type: "REELS", video_url, caption, share_to_feed };
-  if (cover_url) params.cover_url = cover_url;
+  const params: any = {
+    media_type: "REELS",
+    video_url: httpsUrl(video_url, "video_url"),
+    caption: String(caption ?? "").slice(0, 2200), // límite de Instagram
+    share_to_feed: share_to_feed !== false,
+  };
+  if (cover_url) params.cover_url = httpsUrl(cover_url, "cover_url");
 
   const { id: containerId } = await ig(`/${IG_USER_ID}/media`, "POST", params);
   return (
@@ -301,7 +341,8 @@ async function handleSubmitReel({
   );
 }
 
-async function handleFinalizeReel({ container_id }: any): Promise<string> {
+async function handleFinalizeReel({ container_id: raw }: any): Promise<string> {
+  const container_id = igId(raw, "container_id");
   const { status_code } = await ig(`/${container_id}?fields=status_code`);
 
   if (status_code === "IN_PROGRESS") {
@@ -330,43 +371,54 @@ async function callTool(name: string, args: any): Promise<string> {
     case "analyze_viral_patterns": return handleAnalyzeViral();
     case "submit_reel":            return handleSubmitReel(args);
     case "finalize_reel":          return handleFinalizeReel(args);
-    default: throw new Error(`Herramienta desconocida: ${name}`);
+    default: throw new IgError("Herramienta desconocida.");
   }
 }
 
 // ─── Handler principal de Vercel ─────────────────────────────────────────────
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // CORS
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
-  if (req.method === "OPTIONS") return res.status(200).end();
-  if (req.method !== "POST")
-    return res.status(405).json({ error: "Method Not Allowed" });
+const PROTOCOLOS = ["2025-06-18", "2025-03-26", "2024-11-05"];
 
-  // Autenticación
-  const auth = req.headers["authorization"] ?? "";
-  if (!MCP_SECRET || auth !== `Bearer ${MCP_SECRET}`) {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // Sin CORS: lo llaman servidores (app de Claude), no páginas web en un navegador.
+  res.setHeader("Cache-Control", "no-store");
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("Referrer-Policy", "no-referrer");
+
+  if (req.method !== "POST") {
+    res.setHeader("Allow", "POST");
+    return res.status(405).json({ error: "Method Not Allowed" });
+  }
+
+  // Autenticación: header Bearer o clave en la ruta /mcp/<clave>
+  const header = String(req.headers["authorization"] ?? "");
+  const bearer = header.startsWith("Bearer ") ? header.slice(7) : "";
+  const fromPath = typeof req.query.key === "string" ? req.query.key : "";
+  const given = bearer || fromPath;
+  if (!MCP_SECRET || MCP_SECRET.length < 32 || !given || !sameSecret(given, MCP_SECRET)) {
     return res
       .status(401)
-      .json({ jsonrpc: "2.0", id: null, error: { code: -32000, message: "Unauthorized" } });
+      .json({ jsonrpc: "2.0", id: null, error: { code: -32001, message: "Unauthorized" } });
   }
 
   const { method, params, id } = (req.body as any) ?? {};
 
   try {
     if (method === "initialize") {
+      const pedido = params?.protocolVersion;
       return res.json({
         jsonrpc: "2.0", id,
         result: {
-          protocolVersion: "2024-11-05",
+          protocolVersion: PROTOCOLOS.includes(pedido) ? pedido : PROTOCOLOS[0],
           capabilities: { tools: {} },
-          serverInfo: { name: "instagram-mcp-cloud", version: "1.0.0" },
+          serverInfo: { name: "instagram-mcp-cloud", version: "1.1.0" },
         },
       });
     }
 
-    if (method === "notifications/initialized") return res.status(200).end();
+    // Notificaciones: no llevan respuesta
+    if (typeof method === "string" && method.startsWith("notifications/")) return res.status(202).end();
+
+    if (method === "ping") return res.json({ jsonrpc: "2.0", id, result: {} });
 
     if (method === "tools/list") {
       return res.json({ jsonrpc: "2.0", id, result: { tools: TOOLS } });
@@ -383,12 +435,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     return res.status(400).json({
       jsonrpc: "2.0", id,
-      error: { code: -32601, message: `Método no soportado: ${method}` },
+      error: { code: -32601, message: "Método no soportado" },
     });
   } catch (e: any) {
+    // Errores de Instagram o de validación: se muestran (sin token).
+    // Cualquier otro: mensaje genérico, detalle solo en los logs privados de Vercel.
+    const publico = e instanceof IgError;
+    if (!publico) console.error("mcp error:", scrub(String(e?.stack ?? e)));
+    const text = publico
+      ? `❌ ${scrub(e.message)}`
+      : e?.name === "TimeoutError"
+        ? "❌ Instagram tardó demasiado en responder. Prueba de nuevo en un momento."
+        : "❌ Error interno del servidor. Prueba de nuevo en un momento.";
     return res.json({
       jsonrpc: "2.0", id,
-      result: { content: [{ type: "text", text: `❌ Error: ${e.message}` }], isError: true },
+      result: { content: [{ type: "text", text }], isError: true },
     });
   }
 }
