@@ -5,7 +5,11 @@
   "scripts": {
     "studio": "remotion studio",
     "render": "remotion render ReelFromTimeline",
-    "ensure-browser": "remotion browser ensure"
+    "ensure-browser": "remotion browser ensure",
+    "typecheck": "tsc --noEmit -p ."
+  },
+  "engines": {
+    "node": ">=20"
   },
   "dependencies": {
     "@remotion/cli": "4.0.540",
