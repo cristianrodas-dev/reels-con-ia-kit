@@ -10,8 +10,11 @@ const { IG_USER_ID, IG_ACCESS_TOKEN, IG_API_VERSION = "v22.0" } = process.env;
 async function main() {
   console.log("🔍 Probando conexión con Instagram...\n");
 
+  // Misma forma de autenticar que los servidores MCP (token en el header):
+  // si esta prueba pasa, ellos también van a poder hablar con Instagram.
   const res = await fetch(
-    `https://graph.instagram.com/${IG_API_VERSION}/me?fields=id,user_id,username,account_type,media_count,followers_count&access_token=${IG_ACCESS_TOKEN}`
+    `https://graph.instagram.com/${IG_API_VERSION}/me?fields=id,user_id,username,account_type,media_count,followers_count`,
+    { headers: { Authorization: `Bearer ${IG_ACCESS_TOKEN}` } }
   );
   const data = (await res.json()) as any;
 
