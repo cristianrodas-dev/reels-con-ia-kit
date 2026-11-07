@@ -18,6 +18,7 @@
 
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createHash, timingSafeEqual } from "node:crypto";
+import { VERSION } from "./_version.js";
 
 // ─── Entorno ──────────────────────────────────────────────────────────────────
 const IG_USER_ID = process.env.IG_USER_ID!;
@@ -58,12 +59,14 @@ function httpsUrl(v: unknown, campo: string): string {
 // ─── Instagram API ─────────────────────────────────────────────────────────────
 async function ig(path: string, method = "GET", body?: object): Promise<any> {
   const url = path.startsWith("http") ? path : `${BASE}${path}`;
-  const sep = url.includes("?") ? "&" : "?";
-  const full = `${url}${sep}access_token=${IG_ACCESS_TOKEN}`;
 
-  const res = await fetch(full, {
+  // El token va en el header, no en la URL: las URLs suelen quedar en logs.
+  const headers: Record<string, string> = { Authorization: `Bearer ${IG_ACCESS_TOKEN}` };
+  if (body) headers["Content-Type"] = "application/json";
+
+  const res = await fetch(url, {
     method,
-    headers: body ? { "Content-Type": "application/json" } : undefined,
+    headers,
     body: body ? JSON.stringify(body) : undefined,
     signal: AbortSignal.timeout(8_000), // margen antes del corte de 10s de Vercel
   });
@@ -250,7 +253,7 @@ async function handleAnalyzeViral(): Promise<string> {
   const media = await ig(
     `/${IG_USER_ID}/media?fields=id,media_type,media_product_type,timestamp,caption,like_count,comments_count,permalink&limit=20`
   );
-  const reels = (media.data ?? [])
+  const reels: any[] = (media.data ?? [])
     .filter((m: any) => m.media_product_type === "REELS" || m.media_type === "VIDEO")
     .slice(0, 8); // Limitar a 8 para el timeout de 10s de Vercel Hobby
 
@@ -410,7 +413,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         result: {
           protocolVersion: PROTOCOLOS.includes(pedido) ? pedido : PROTOCOLOS[0],
           capabilities: { tools: {} },
-          serverInfo: { name: "instagram-mcp-cloud", version: "1.1.0" },
+          serverInfo: { name: "instagram-mcp-cloud", version: VERSION },
         },
       });
     }
