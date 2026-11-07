@@ -8,6 +8,7 @@ import * as dotenv from "dotenv";
 import * as fs from "fs";
 import * as path from "path";
 import { fileURLToPath, pathToFileURL } from "url";
+import { VERSION } from "../api/_version.js";
 
 // Cargar variables de entorno desde .env en el directorio padre
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -42,7 +43,7 @@ async function getTools() {
 }
 
 const server = new Server(
-  { name: "instagram-mcp", version: "1.1.0" },
+  { name: "instagram-mcp", version: VERSION },
   { capabilities: { tools: {} } }
 );
 

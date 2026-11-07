@@ -19,12 +19,14 @@ export function configure(c: Ctx) {
 async function igRequest(endpoint: string, method = "GET", body?: object) {
   const base = `https://graph.instagram.com/${ctx.apiVersion}`;
   const url = endpoint.startsWith("http") ? endpoint : `${base}${endpoint}`;
-  const separator = url.includes("?") ? "&" : "?";
-  const fullUrl = `${url}${separator}access_token=${ctx.token}`;
 
-  const res = await fetch(fullUrl, {
+  // El token va en el header, no en la URL: las URLs suelen quedar en logs.
+  const headers: Record<string, string> = { Authorization: `Bearer ${ctx.token}` };
+  if (body) headers["Content-Type"] = "application/json";
+
+  const res = await fetch(url, {
     method,
-    headers: body ? { "Content-Type": "application/json" } : undefined,
+    headers,
     body: body ? JSON.stringify(body) : undefined,
   });
 
