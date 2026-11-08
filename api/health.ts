@@ -2,7 +2,7 @@
  * Endpoint de salud — sin autenticación.
  * GET /api/health → { ok: true, version: "x.y.z", ts: "..." }
  */
-import type { VercelRequest, VercelResponse } from "@vercel/node";
+import type { VercelRequest, VercelResponse } from "./_types.js";
 import { VERSION } from "./_version.js";
 
 export default function handler(_req: VercelRequest, res: VercelResponse) {

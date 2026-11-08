@@ -16,7 +16,7 @@
  *   2. finalize_reel(container_id)       → esperar 30-60s antes de llamarlo
  */
 
-import type { VercelRequest, VercelResponse } from "@vercel/node";
+import type { VercelRequest, VercelResponse } from "./_types.js";
 import { createHash, timingSafeEqual } from "node:crypto";
 import { VERSION } from "./_version.js";
 
