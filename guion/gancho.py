@@ -306,7 +306,8 @@ def load_formulas():
     p = os.path.join(here, "ganchos.json")
     if not os.path.exists(p):
         return []
-    data = json.load(open(p, encoding="utf-8"))
+    with open(p, encoding="utf-8") as f:
+        data = json.load(f)
     order = data.get("orden_clasificacion") or [f["id"] for f in data["formulas"]]
     by_id = {f["id"]: f for f in data["formulas"]}
     return [by_id[i] for i in order if i in by_id]

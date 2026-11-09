@@ -70,6 +70,10 @@ Cada persona usa **sus propias** cuentas y claves (Instagram, Supabase, voz), qu
 - **Cero automatización de interacciones** (likes, follows, comentarios en otras cuentas). Va contra las reglas de Instagram.
 - **Secretos solo en `.env`.** Ver [SECURITY.md](SECURITY.md).
 
+## 🤝 Contribuir
+
+Los PRs son bienvenidos. Lee [CONTRIBUTING.md](CONTRIBUTING.md) antes de abrir uno.
+
 ## 📄 Licencia
 
 MIT. Ver [LICENSE](LICENSE) y [CREDITS.md](CREDITS.md) (incluye la licencia de Remotion, que tiene condiciones para empresas).

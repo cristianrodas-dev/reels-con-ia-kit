@@ -1,0 +1,28 @@
+# Actualizaciones de versión una vez por mes (las de seguridad llegan apenas salen).
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+    groups:
+      dependencias:
+        update-types: [minor, patch]
+
+  - package-ecosystem: npm
+    directory: /video
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+    groups:
+      # Remotion exige la misma versión en todos sus paquetes: se actualizan juntos.
+      remotion:
+        patterns: ["remotion", "@remotion/*"]
+      dependencias:
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
