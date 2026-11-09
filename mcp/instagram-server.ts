@@ -14,9 +14,10 @@ import { VERSION } from "../api/_version.js";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.join(__dirname, "../.env") });
 
-const IG_USER_ID = process.env.IG_USER_ID!;
-const IG_ACCESS_TOKEN = process.env.IG_ACCESS_TOKEN!;
-const IG_API_VERSION = process.env.IG_API_VERSION || "v22.0";
+const env = (k: string) => (process.env[k] ?? "").trim();
+const IG_USER_ID = env("IG_USER_ID");
+const IG_ACCESS_TOKEN = env("IG_ACCESS_TOKEN");
+const IG_API_VERSION = env("IG_API_VERSION") || "v22.0";
 
 if (!IG_USER_ID || !IG_ACCESS_TOKEN) {
   console.error("ERROR: Faltan IG_USER_ID o IG_ACCESS_TOKEN en .env");

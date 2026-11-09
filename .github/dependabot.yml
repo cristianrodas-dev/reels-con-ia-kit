@@ -1,4 +1,6 @@
 # Actualizaciones de versión una vez por mes (las de seguridad llegan apenas salen).
+# Las versiones mayores (TypeScript 7, React 19, etc.) no abren PR automático:
+# se revisan a mano. Esto no frena los PRs de seguridad.
 version: 2
 updates:
   - package-ecosystem: npm
@@ -6,6 +8,9 @@ updates:
     schedule:
       interval: monthly
     open-pull-requests-limit: 5
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
       dependencias:
         update-types: [minor, patch]
@@ -15,12 +20,16 @@ updates:
     schedule:
       interval: monthly
     open-pull-requests-limit: 5
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
       # Remotion exige la misma versión en todos sus paquetes: se actualizan juntos.
       remotion:
         patterns: ["remotion", "@remotion/*"]
       dependencias:
         update-types: [minor, patch]
+        exclude-patterns: ["remotion", "@remotion/*"]
 
   - package-ecosystem: github-actions
     directory: /

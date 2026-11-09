@@ -21,10 +21,13 @@ import { createHash, timingSafeEqual } from "node:crypto";
 import { VERSION } from "./_version.js";
 
 // ─── Entorno ──────────────────────────────────────────────────────────────────
-const IG_USER_ID = process.env.IG_USER_ID!;
-const IG_ACCESS_TOKEN = process.env.IG_ACCESS_TOKEN!;
-const IG_API_VERSION = process.env.IG_API_VERSION ?? "v22.0";
-const MCP_SECRET = process.env.MCP_SECRET!;
+// .trim(): un espacio o salto de línea pegado de más en el panel de Vercel
+// rompe el header Authorization (pasó con un token nuevo el 9/11/2026).
+const env = (k: string) => (process.env[k] ?? "").trim();
+const IG_USER_ID = env("IG_USER_ID");
+const IG_ACCESS_TOKEN = env("IG_ACCESS_TOKEN");
+const IG_API_VERSION = env("IG_API_VERSION") || "v22.0";
+const MCP_SECRET = env("MCP_SECRET");
 const BASE = `https://graph.instagram.com/${IG_API_VERSION}`;
 
 // ─── Seguridad ────────────────────────────────────────────────────────────────
