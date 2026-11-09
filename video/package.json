@@ -12,10 +12,10 @@
     "node": ">=20"
   },
   "dependencies": {
-    "@remotion/cli": "4.0.540",
+    "@remotion/cli": "4.0.541",
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "remotion": "4.0.540"
+    "remotion": "4.0.541"
   },
   "devDependencies": {
     "@types/react": "18.3.12",
