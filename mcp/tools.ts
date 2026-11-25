@@ -136,12 +136,45 @@ function mimeFor(name: string): string {
   return "video/mp4";
 }
 
+/** Nombre de objeto válido en el bucket: sin carpetas ni "..", con extensión permitida. */
+const OBJECT_RE = /^[A-Za-z0-9_-][A-Za-z0-9._-]{0,120}\.(mp4|png|jpe?g)$/i;
+function checkObject(object: unknown): string {
+  const s = String(object ?? "");
+  if (!OBJECT_RE.test(s) || s.includes("..")) {
+    throw new Error(`Nombre de objeto inválido: "${s}". Solo letras, números, . _ - y extensión .mp4, .png o .jpg.`);
+  }
+  return s;
+}
+
+/** Tope de tamaño para subir (Instagram no acepta Reels más grandes que esto). */
+const MAX_BYTES = 1024 * 1024 * 1024; // 1 GB
+
+/** Revisa que el contenido sea de verdad un MP4, PNG o JPG (no solo la extensión). */
+function sniffType(buf: Buffer): "mp4" | "png" | "jpg" | null {
+  if (buf.length >= 12 && buf.toString("latin1", 4, 8) === "ftyp") return "mp4";
+  if (buf.length >= 8 && buf.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))) return "png";
+  if (buf.length >= 3 && buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) return "jpg";
+  return null;
+}
+
 export async function uploadVideo(localPath: string, name?: string): Promise<{ publicUrl: string; object: string }> {
   const fs = await import("fs");
   const { url, key, bucket } = supabaseCfg();
-  if (!fs.existsSync(localPath)) throw new Error(`No existe el archivo: ${localPath}`);
-  const object = name ?? safeName(localPath);
-  const body = fs.readFileSync(localPath);
+
+  // El bucket es público: solo se suben videos e imágenes, nunca otro tipo de archivo.
+  const p = String(localPath ?? "");
+  if (!/\.(mp4|png|jpe?g)$/i.test(p)) throw new Error("Solo se pueden subir archivos .mp4, .png o .jpg.");
+  if (!fs.existsSync(p)) throw new Error(`No existe el archivo: ${p}`);
+  const st = fs.statSync(p);
+  if (!st.isFile()) throw new Error(`No es un archivo: ${p}`);
+  if (st.size > MAX_BYTES) throw new Error(`El archivo pesa ${(st.size / 1e6).toFixed(0)} MB (máximo 1 GB).`);
+
+  const body = fs.readFileSync(p);
+  const real = sniffType(body);
+  if (!real) throw new Error("El contenido no es un MP4, PNG ni JPG válido: no se sube.");
+  const object = name ? checkObject(name) : safeName(p);
+  const extObj = object.toLowerCase().endsWith(".mp4") ? "mp4" : object.toLowerCase().endsWith(".png") ? "png" : "jpg";
+  if (extObj !== real) throw new Error(`La extensión de "${object}" no coincide con el contenido (${real}).`);
   const res = await fetch(`${url}/storage/v1/object/${bucket}/${object}`, {
     method: "POST",
     headers: { Authorization: `Bearer ${key}`, apikey: key, "Content-Type": mimeFor(object), "x-upsert": "true" },
@@ -151,7 +184,8 @@ export async function uploadVideo(localPath: string, name?: string): Promise<{ p
   return { publicUrl: `${url}/storage/v1/object/public/${bucket}/${object}`, object };
 }
 
-export async function deleteVideo(object: string): Promise<void> {
+export async function deleteVideo(rawObject: string): Promise<void> {
+  const object = checkObject(rawObject);
   const { url, key, bucket } = supabaseCfg();
   const res = await fetch(`${url}/storage/v1/object/${bucket}/${object}`, {
     method: "DELETE",
