@@ -30,16 +30,8 @@ async function main() {
   console.log(`   Posts:       ${data.media_count}`);
   console.log(`   Seguidores:  ${data.followers_count ?? "N/A"}`);
 
-  // Verificar expiración del token
-  const dbg = await fetch(
-    `https://graph.instagram.com/${IG_API_VERSION}/access_token?grant_type=ig_refresh_token&access_token=${IG_ACCESS_TOKEN}`
-  );
-  const tokenInfo = (await dbg.json()) as any;
-  if (tokenInfo.expires_in) {
-    const days = Math.round(tokenInfo.expires_in / 86400);
-    console.log(`\n🔑 Token renovado — válido por ${days} días más.`);
-    console.log("   (ejecuta `npm run refresh` cada ~50 días para mantenerlo activo)");
-  }
+  // La prueba no toca el token. Para renovarlo (y ver cuántos días dura): npm run refresh
+  console.log("\n🔑 El token dura 60 días: ejecuta `npm run refresh` cada ~50 días para mantenerlo activo.");
 }
 
 main().catch((e) => {

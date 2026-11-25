@@ -15,6 +15,10 @@ dotenv.config({ path: envPath });
 const { IG_ACCESS_TOKEN, IG_API_VERSION = "v22.0" } = process.env;
 
 async function main() {
+  if (!IG_ACCESS_TOKEN?.trim()) {
+    console.error("❌ Falta IG_ACCESS_TOKEN en el .env");
+    process.exit(1);
+  }
   const res = await fetch(
     `https://graph.instagram.com/${IG_API_VERSION}/refresh_access_token?grant_type=ig_refresh_token&access_token=${IG_ACCESS_TOKEN}`
   );
@@ -26,7 +30,13 @@ async function main() {
     process.exit(1);
   }
 
-  const env = fs.readFileSync(envPath, "utf8");
+  // Nunca escribir algo que no sea un token real en el .env.
+  if (typeof data.access_token !== "string" || data.access_token.length < 20) {
+    console.error("❌ Instagram respondió sin un token nuevo: el .env no se modificó.");
+    process.exit(1);
+  }
+
+  const env =fs.readFileSync(envPath, "utf8");
   const updated = env.replace(/^IG_ACCESS_TOKEN=.*$/m, `IG_ACCESS_TOKEN=${data.access_token}`);
   fs.writeFileSync(envPath, updated);
 
